@@ -8,6 +8,6 @@ import (
 
 func main() {
 	greeting := "Hello, OTUS!"
-	reversed := reverse.String(greeting)
-	fmt.Println(reversed)
+	reversedGreeting := reverse.String(greeting)
+	fmt.Println(reversedGreeting)
 }
