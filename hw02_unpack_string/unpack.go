@@ -2,7 +2,7 @@ package hw02unpackstring
 
 import (
 	"errors"
-	"fmt"
+
 	"strconv"
 )
 
@@ -33,23 +33,26 @@ func Unpack(input string) (string, error) {
 		return "", nil
 	}
 
-	// onlyDigits := true
 	result := []rune{}
 	var previousRune rune
-	// var builder = strconv.Builder
 	for i, r := range input {
-		fmt.Printf("========= index = %d, rune = %s \n", i, string(r))
-		if isDigit(r) && isDigit(previousRune) {
-			return "", ErrInvalidString
+		if isDigit(r) {
+			if 0 == i || isDigit(previousRune) {
+				return string(result), ErrInvalidString
+			}
 		}
 
 		if isDigit(r) {
 			number, _ := strconv.Atoi(string(r))
-			var characters []rune
-			for range number {
-				characters = append(characters, previousRune)
+			if number > 0 {
+				var characters []rune
+				for range number - 1 {
+					characters = append(characters, previousRune)
+				}
+				result = append(result, characters...)
+			} else {
+				result = result[:len(result)-1]
 			}
-			result = append(result, characters...)
 		} else {
 			result = append(result, r)
 		}
