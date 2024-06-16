@@ -2,18 +2,20 @@ package hw02unpackstring
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 )
 
 var ErrInvalidString = errors.New("invalid string")
 
-func Unpack(_ string) (string, error) {
+func Unpack(input string) (string, error) {
 	// Place your code here.
 
 	// TODO: wrong cases
 	/*
 		1. first digit
-		2. doubled digits, multiple digits
-		3. no letters
+		2. doubled digits, multiple digits in a row
+		3. no letters, but digits
 		4. back ticks without digits or escapes
 	*/
 	// TODO: use cases
@@ -22,8 +24,46 @@ func Unpack(_ string) (string, error) {
 		2. letters and digits
 		3. special characters like \n
 		4. empty string
-		5. zero (removal of a letter)
-		6. back ticks and escaped digits or escapes
+		5. zero (removal of a letter, escaped digit or escape itself)
+		6. back ticks and escaped digits or escapes themselves
+		7. undocumented: a multi-line string (because of back ticks)
 	*/
-	return "", nil
+
+	if len(input) == 0 {
+		return "", nil
+	}
+
+	// onlyDigits := true
+	result := []rune{}
+	var previousRune rune
+	// var builder = strconv.Builder
+	for i, r := range input {
+		fmt.Printf("========= index = %d, rune = %s \n", i, string(r))
+		if isDigit(r) && isDigit(previousRune) {
+			return "", ErrInvalidString
+		}
+
+		if isDigit(r) {
+			number, _ := strconv.Atoi(string(r))
+			var characters []rune
+			for range number {
+				characters = append(characters, previousRune)
+			}
+			result = append(result, characters...)
+		} else {
+			result = append(result, r)
+		}
+
+		previousRune = r
+	}
+
+	return string(result), nil
+}
+
+func isDigit(character rune) bool {
+	if _, err := strconv.Atoi(string(character)); err == nil {
+		return true
+	} else {
+		return false
+	}
 }
