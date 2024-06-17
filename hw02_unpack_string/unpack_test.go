@@ -93,3 +93,59 @@ func TestIsBackslashe(t *testing.T) {
 		})
 	}
 }
+
+func TestIsLetter(t *testing.T) {
+	testData := []struct {
+		input       []rune
+		expected    bool
+		description string
+	}{
+		{input: []rune("3"), expected: false, description: "digit"},
+		{input: []rune(`\`), expected: false, description: "backshashe in back ticks"},
+		{input: []rune("a"), expected: true, description: "letter"},
+		{input: []rune("\\"), expected: false, description: "backslashe in quotes"},
+	}
+	for _, tc := range testData {
+		tc := tc
+		t.Run(tc.description, func(t *testing.T) {
+			actual := isLetter(tc.input[0])
+			require.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestFirstInSlkice(t *testing.T) {
+	testData := []struct {
+		input       []rune
+		expected    rune
+		description string
+	}{
+		{input: []rune{rune(70), rune(71), rune(72)}, expected: rune(70), description: "multiple elements"},
+		{input: []rune{rune(70)}, expected: rune(70), description: "single element"},
+	}
+	for _, tc := range testData {
+		tc := tc
+		t.Run(tc.description, func(t *testing.T) {
+			actual := first(tc.input)
+			require.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestLastInSlkice(t *testing.T) {
+	testData := []struct {
+		input       []rune
+		expected    rune
+		description string
+	}{
+		{input: []rune{rune(70), rune(71), rune(72)}, expected: rune(72), description: "multiple elements"},
+		{input: []rune{rune(70)}, expected: rune(70), description: "single element"},
+	}
+	for _, tc := range testData {
+		tc := tc
+		t.Run(tc.description, func(t *testing.T) {
+			actual := last(tc.input)
+			require.Equal(t, tc.expected, actual)
+		})
+	}
+}
