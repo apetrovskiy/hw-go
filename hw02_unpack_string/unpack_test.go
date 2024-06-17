@@ -24,11 +24,11 @@ func TestUnpack(t *testing.T) {
 		{input: `qwe\\5`, expected: `qwe\\\\\`},
 		{input: `qwe\\\3`, expected: `qwe\3`},
 		// from README.ms
-		// {input: `d\n5abc`, expected: `d\n\n\n\n\nabc`},
+		{input: `d\n5abc`, expected: `d\n\n\n\n\nabc`},
 		// more special characters
 		// https://en.wikipedia.org/wiki/List_of_Unicode_characters
-		// {input: `d\z2abc`, expected: `d\z\zabc`},
-		// {input: `d\b2abc`, expected: `d\b\babc`},
+		{input: `d\z2abc`, expected: `d\z\zabc`},
+		{input: `d\b3abc`, expected: `d\b\b\babc`},
 		{input: `d\a0abc`, expected: `dabc`},
 		//
 	}

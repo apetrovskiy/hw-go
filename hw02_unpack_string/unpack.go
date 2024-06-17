@@ -34,73 +34,22 @@ func Unpack(input string) (string, error) {
 
 	result := []rune{}
 	var previousRune []rune
-	// for i, r := range input {
-	// 	if isDigit(r) {
-	// 		if i == 0 || isDigit(previousRune[0]) {
-	// 			return string(result), ErrInvalidString
-	// 		}
-	// 		if isBackslashe(previousRune[0]) && len(previousRune) < 2 {
-	// 			result = append(result[:len(result)-1], r)
-	// 			previousRune = append(previousRune, r)
-	// 			continue
-	// 		}
-	// 	}
-	// 		if i > 0 && isBackslashe(previousRune[0]) && len(previousRune) < 2 {
-	// 			// nothing to append to result
-	// 			previousRune = append(previousRune, r)
-	// 			continue
-	// 		}
-
-	// 	if isBackslashe(r) {
-	// 		if isBackslashe(previousRune[0]) && len(previousRune) < 2 {
-	// 			// nothing to append to result
-	// 			previousRune = append(previousRune, r)
-	// 			continue
-	// 		}
-	// 	}
-
-	// 	if isDigit(r) {
-	// 		number, _ := strconv.Atoi(string(r))
-	// 		if number > 0 {
-	// 			var characters []rune
-	// 			for range number - 1 {
-	// 				if isDigit(previousRune[len(previousRune)-1]) {
-	// 				characters = append(characters, previousRune[len(previousRune)-1])
-	// 				} else {
-	// 					characters = append(characters,previousRune[0])
-	// 				}
-	// 			}
-	// 			result = append(result, characters...)
-	// 		} else {
-	// 			result = result[:len(result)-1]
-	// 		}
-	// 		previousRune = []rune{r}
-	// 	} else {
-	// 		result = append(result, r)
-	// 		previousRune = []rune{r}
-	// 	}
-
-	// }
 
 	for i, r := range input {
 		if isDigit(r) {
-			if i == 0 || isDigit(previousRune[0]) {
+			// 1xxx; xxx11xxx -> error
+			if i == 0 || isDigit(first(previousRune)) {
 				return string(result), ErrInvalidString
 			}
-			if isBackslashe(previousRune[0]) && len(previousRune) < 2 {
+			// \1 -> result + 1, previous \1
+			if isBackslashe(first(previousRune)) && len(previousRune) == 1 {
 				result = append(result[:len(result)-1], r)
 				previousRune = append(previousRune, r)
 				continue
 			}
 		}
-		if isBackslashe(r) {
-			if isBackslashe(previousRune[0]) && len(previousRune) < 2 {
-				// nothing to append to result
-				previousRune = append(previousRune, r)
-				continue
-			}
-		}
-		if i > 0 && isBackslashe(previousRune[0]) && len(previousRune) < 2 {
+		// \a -> privous \a
+		if i > 0 && isBackslashe(first(previousRune)) && len(previousRune) == 1 {
 			// nothing to append to result
 			previousRune = append(previousRune, r)
 			continue
@@ -108,24 +57,28 @@ func Unpack(input string) (string, error) {
 
 		if isDigit(r) {
 			number, _ := strconv.Atoi(string(r))
-			if number > 0 {
-				var characters []rune
-				for range number - 1 {
-					if isDigit(previousRune[len(previousRune)-1]) {
-						characters = append(characters, previousRune[len(previousRune)-1])
-					} else {
-						characters = append(characters, previousRune[0])
-					}
-				}
-				result = append(result, characters...)
-			} else {
+			if number == 0 {
+				result = result[:len(result)-1]
+				continue
+			}
+			if isLetter(last(previousRune)) && isBackslashe(first(previousRune)) {
+				number++
 				result = result[:len(result)-1]
 			}
+			var characters []rune
+			for range number - 1 {
+				if isLetter(last(previousRune)) {
+					characters = append(characters, previousRune...)
+				} else {
+					characters = append(characters, last(previousRune))
+				}
+			}
+			result = append(result, characters...)
 			previousRune = []rune{r}
-		} else {
-			result = append(result, r)
-			previousRune = []rune{r}
+			continue
 		}
+		result = append(result, r)
+		previousRune = []rune{r}
 	}
 
 	return string(result), nil
@@ -143,4 +96,16 @@ func isDigit(character rune) bool {
 
 func isBackslashe(character rune) bool {
 	return string(character) == `\`
+}
+
+func isLetter(character rune) bool {
+	return !isDigit(character) && !isBackslashe(character)
+}
+
+func first(characters []rune) rune {
+	return characters[0]
+}
+
+func last(characters []rune) rune {
+	return characters[len(characters)-1]
 }
